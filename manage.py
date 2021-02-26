@@ -95,6 +95,7 @@ def view():
     c = conn.cursor()
     c.execute("SELECT signageid, description FROM signages WHERE username=?", (session["user_id"],))
     signages = c.fetchall()
+    conn.close()
     return render_template("manage/view.html", signages=signages)
 
 
