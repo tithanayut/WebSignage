@@ -1,3 +1,5 @@
+import os
+
 from flask import Blueprint, render_template, request, redirect, session
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,7 +8,7 @@ import sqlite3
 from auth import login_required
 
 # Config db connection
-dbpath = "database.db"
+dbpath = os.getenv("DB_PATH")
 
 manage = Blueprint("manage", __name__)
 

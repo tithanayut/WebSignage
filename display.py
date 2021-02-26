@@ -1,10 +1,12 @@
+import os
+
 from flask import Blueprint, render_template, request, redirect, session
 import sqlite3
 
 display = Blueprint("display", __name__)
 
 # Config db connection
-dbpath = "database.db"
+dbpath = os.getenv("DB_PATH")
 
 @display.route("")
 def index():
