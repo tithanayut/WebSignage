@@ -1,0 +1,32 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Manage
+{% endblock %}
+
+{% block main %}
+    {% if signages|length != 0 %}
+    <p>You have {{ signages|length }} signage in total.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>SignageID</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+                {% for signage in signages %}
+                    <tr>
+                        <td>{{ signage[0] }}</td>
+                        <td>{{ signage[1] }}</td>
+                        <td><a href="/manage/edit?id={{ signage[0] }}">Edit</a> | <a href="/manage/delete?id={{ signage[0] }}">Delete</a></td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        You have no signage yet. You may want to <a href="/manage/create">create</a> one.
+    {% endif %}
+{% endblock %}
