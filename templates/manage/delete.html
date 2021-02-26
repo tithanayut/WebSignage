@@ -1,0 +1,15 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Delete
+{% endblock %}
+
+{% block main %}
+    <p>Are you sure you want to delete <span class="red">{{ signageid }}.</span></p>
+    <form action="" method="post">
+        <input type="hidden" name="signageid" value="{{ signageid }}">
+        <button class="btn btn-danger" type="submit">Yes, I confirm.</button>
+    </form>
+    <br>
+    <a href="/manage/view">No, revert back.</a>
+{% endblock %}

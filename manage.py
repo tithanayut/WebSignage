@@ -96,3 +96,33 @@ def view():
     c.execute("SELECT signageid, description FROM signages WHERE username=?", (session["user_id"],))
     signages = c.fetchall()
     return render_template("manage/view.html", signages=signages)
+
+
+@manage.route("delete", methods=["GET", "POST"])
+@login_required
+def delete():
+    if request.method == "POST":
+        if not request.form.get("signageid"):
+            return redirect("/manage/view")
+        sid = request.form.get("signageid")
+
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT COUNT(id) AS \"COUNT(id)\" FROM signages WHERE username=? AND signageid=?", (session["user_id"], sid))
+        q = c.fetchone()
+
+        if q[0] == 0:
+            conn.close()
+            return render_template("manage/error.html", msg="Failed to delete signage.")
+
+        c.execute("DELETE FROM signages WHERE signageid=?", (sid,))
+        c.execute("DELETE FROM slides WHERE signageid=?", (sid,))
+        conn.commit()
+
+        conn.close()
+
+        return redirect("/manage/view")
+    else:
+        if not request.args.get("id"):
+            return redirect("/manage/view")
+        return render_template("manage/delete.html", signageid=request.args.get("id"))
