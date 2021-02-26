@@ -90,6 +90,6 @@ def register():
 def view():
     conn = sqlite3.connect(dbpath)
     c = conn.cursor()
-    c.execute("SELECT signageid, description, username FROM signages WHERE username=?", (session["user_id"],))
+    c.execute("SELECT signageid, description FROM signages WHERE username=?", (session["user_id"],))
     signages = c.fetchall()
     return render_template("manage/view.html", signages=signages)
