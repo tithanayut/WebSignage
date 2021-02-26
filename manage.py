@@ -32,10 +32,10 @@ def login():
         c = conn.cursor()
         c.execute("SELECT username, hash FROM users WHERE username = ?", (request.form.get("username"),))
         q = c.fetchall()
+        conn.close()
 
         if len(q) != 1 or not check_password_hash(q[0][1], request.form.get("password")):
             return render_template("manage/error.html", msg="Invalid username and/or password.")
-        conn.close()
 
         # Set session
         session["user_id"] = q[0][0]
