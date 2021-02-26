@@ -87,6 +87,7 @@ def register():
 
 
 @manage.route("view")
+@login_required
 def view():
     conn = sqlite3.connect(dbpath)
     c = conn.cursor()
