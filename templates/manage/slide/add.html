@@ -1,0 +1,28 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Add Slide
+{% endblock %}
+
+{% block main %}
+    <form action="" method="post">
+        <div class="form-group">
+            <input type="number" class="form-control" name="sindex" min="0" step="0.01" placeholder="Slide Index" autocomplete="off" autofocus >
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="surl" placeholder="Image URL" autocomplete="off" >
+        </div>
+        <div class="form-group">
+            <input type="number" class="form-control" name="sduration" min="0" placeholder="Duration in ms" autocomplete="off" >
+        </div>
+        <input type="hidden" name="signageid" value="{{ signageid }}">
+        <button class="btn btn-primary" type="submit">Add Slide</button><br>
+        <button type="button" class="btn btn-link" onclick="goBack()">Go Back</button>
+
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+    </form>
+{% endblock %}

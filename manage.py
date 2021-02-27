@@ -231,3 +231,74 @@ def edit():
             scss = ""
 
         return render_template("manage/edit.html", signageid=signageid, description=description, scss=scss)
+
+
+@manage.route("slide")
+@login_required
+def slide():
+    if not request.args.get("id"):
+        return redirect("/manage/view")
+
+    sid = request.args.get("id")
+
+    # Check owner
+    conn = sqlite3.connect(dbpath)
+    c = conn.cursor()
+    c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
+    signage = c.fetchone()
+
+    if signage is None:
+        conn.close()
+        return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+    # Query slide
+    c.execute("SELECT iindex, imageurl, dduration FROM slides WHERE signageid=? ORDER BY iindex, id ASC", (sid,))
+    slides = c.fetchall()
+    conn.close()
+
+    return render_template("manage/slide.html", slides=slides, signageid=sid)
+
+
+@manage.route("slide/add", methods=["GET", "POST"])
+@login_required
+def slide_add():
+    if request.method == "POST":
+        # Check for user's input
+        if not request.form.get("signageid") or not request.form.get("sindex") or not request.form.get("surl") or not request.form.get("sduration"):
+            return render_template("manage/error.html", msg="Please complete the form.")
+
+        sid = request.form.get("signageid")
+        surl = request.form.get("surl")
+
+        # Validate index and duration
+        try:
+            sduration = int(request.form.get("sduration"))
+            sindex = float(request.form.get("sindex"))
+            if sduration < 0 or sindex < 0:
+                return render_template("manage/error.html", msg="Duration/Index value is invalid.")
+        except ValueError:
+            return render_template("manage/error.html", msg="Duration/Index value is invalid.")
+
+        # Check owner
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
+        signage = c.fetchone()
+
+        if signage is None:
+            conn.close()
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        # Add slide to database
+        c.execute("INSERT INTO slides (signageid, iindex, imageurl, dduration) VALUES (?, ?, ?, ?)", (sid, sindex, surl, sduration))
+        conn.commit()
+        conn.close()
+
+        return redirect("/manage/slide?id=" + sid)
+    else:
+        if not request.args.get("id"):
+            return redirect("/manage/view")
+
+        sid = request.args.get("id")
+
+        return render_template("manage/slide/add.html", signageid=sid)

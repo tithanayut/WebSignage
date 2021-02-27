@@ -1,0 +1,39 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Edit Slides
+{% endblock %}
+
+{% block main %}
+    {% if slides|length != 0 %}
+    <p>You have {{ slides|length }} slides in total.</p>
+    <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slides</button></a><br>
+    <a href="/manage/view"><button type="button" class="btn btn-link">Go Back</button></a><br>
+    <br>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Slide Index</th>
+                <th>Image</th>
+                <th>Duration (ms)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% for slide in slides %}
+                    <tr>
+                        <td>{{ slide[0] }}</td>
+                        <td style="width: 200px;"><a href="{{ slide[1] }}" target="_blank"><img src="{{ slide[1] }}" title="{{ slide[1] }}"></a></td>
+                        <td>{{ slide[2] }}</td>
+                        <td><a href="/manage/slide/edit?id={{ signageid }}&slid={{ slide[0] }}">Edit</a> | <a href="/manage/slide/delete?id={{ signageid }}&slid={{ slide[0] }}">Delete</a></td>
+                </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        You have no slide yet. You may want to <a href="/manage/slide/add?id={{ signageid }}">add</a> one.
+        <br><br>
+        <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slides</button></a><br>
+        <a href="/manage/view"><button type="button" class="btn btn-link">Go Back</button></a>
+    {% endif %}
+{% endblock %}

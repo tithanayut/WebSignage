@@ -76,7 +76,7 @@ def show():
 
     # Query for slides
     c = conn.cursor()
-    c.execute("SELECT imageurl, dduration FROM slides WHERE signageid=? ORDER BY iindex ASC", (sid,))
+    c.execute("SELECT imageurl, dduration FROM slides WHERE signageid=? ORDER BY iindex, id ASC", (sid,))
     slides = c.fetchall()
     conn.close()
 
