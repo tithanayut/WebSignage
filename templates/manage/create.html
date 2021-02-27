@@ -1,0 +1,20 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <form action="" method="post">
+        <div class="form-group">
+            <input type="text" class="form-control" name="signageid" placeholder="Signage ID" autocomplete="off" autofocus >
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="description" placeholder="Description/Title" autocomplete="off" >
+        </div>
+        <div class="form-group">
+            <input type="password" class="form-control" name="signagepw" placeholder="Signage Password">
+        </div>
+        <button class="btn btn-primary" type="submit">Create</button>
+    </form>
+{% endblock %}

@@ -127,3 +127,39 @@ def delete():
         if not request.args.get("id"):
             return redirect("/manage/view")
         return render_template("manage/delete.html", signageid=request.args.get("id"))
+
+
+@manage.route("create", methods=["GET", "POST"])
+@login_required
+def create():
+    if request.method == "POST":
+        # Check for user's input
+        if not request.form.get("signageid") or not request.form.get("signagepw") or not request.form.get("description"):
+            return render_template("manage/error.html", msg="Please complete the form.")
+
+        sid = request.form.get("signageid").upper()
+        spw = request.form.get("signagepw")
+        description = request.form.get("description")
+
+        # Check if Signage ID duplicate
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT COUNT(id) AS \"COUNT(id)\" FROM signages WHERE signageid=?", (sid,))
+        q = c.fetchone()
+
+        if q[0] != 0:
+            conn.close()
+            return render_template("manage/error.html", msg="This Signage ID already exists")
+
+        # Hash password
+        spw_hashed = generate_password_hash(spw)
+
+        # Add user to database
+        c.execute("INSERT INTO signages (signageid, username, description, password) VALUES (?, ?, ?, ?)", (sid, session["user_id"], description, spw_hashed))
+        conn.commit()
+
+        conn.close()
+
+        return redirect("/manage/view")
+    else:
+        return render_template("manage/create.html")
