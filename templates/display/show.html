@@ -18,6 +18,14 @@
     </style>
 {% endblock %}
 
+{% block specialcss %}
+    {% if css %}
+        <style>
+            {{ css }}
+        </style>
+    {% endif %}
+{% endblock %}
+
 {% block main %}
     <img>
 {% endblock %}

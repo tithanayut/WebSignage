@@ -52,8 +52,14 @@ def show():
     # Pop signageid session
     session.pop("signageid")
 
-    # Query for slides
+    # Query for special css
     conn = sqlite3.connect(dbpath)
+    c = conn.cursor()
+    c.execute("SELECT specialcss FROM signages WHERE signageid=?", (sid,))
+    q = c.fetchone()
+    specialcss = q[0]
+
+    # Query for slides
     c = conn.cursor()
     c.execute("SELECT imageurl, dduration FROM slides WHERE signageid=? ORDER BY iindex ASC", (sid,))
     slides = c.fetchall()
@@ -62,4 +68,4 @@ def show():
     if len(slides) < 1:
         return render_template("display/error.html", msg="Signage doesn't contain any slide.")
 
-    return render_template("display/show.html", signageid=sid, slides=slides)
+    return render_template("display/show.html", signageid=sid, slides=slides, css=specialcss)
