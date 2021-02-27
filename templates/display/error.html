@@ -6,4 +6,11 @@
 
 {% block main %}
     <p><span class="bold red">Error:</span> {{ msg }}</p>
+    <button type="button" class="btn btn-link" onclick="goBack()">Go Back</button>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 {% endblock %}
