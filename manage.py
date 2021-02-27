@@ -335,3 +335,27 @@ def slide_delete():
         if not request.args.get("id") or not request.args.get("slid"):
             return redirect("/manage/view")
         return render_template("manage/slide/delete.html", signageid=request.args.get("id"), slid=request.args.get("slid"))
+
+
+@manage.route("begindisplay")
+@login_required
+def begindisplay():
+    if not request.args.get("id"):
+        return redirect("/manage/view")
+
+    sid = request.args.get("id")
+
+    # Check owner
+    conn = sqlite3.connect(dbpath)
+    c = conn.cursor()
+    c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
+    signage = c.fetchone()
+    conn.close()
+
+    if signage is None:
+        return render_template("manage/error.html", msg="Permission error or signage is not found.")
+
+    session["signageid"] = sid
+    session["hidecursor"] = 1
+
+    return redirect("/display/show")

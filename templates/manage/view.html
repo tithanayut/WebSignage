@@ -17,12 +17,11 @@
             </tr>
         </thead>
         <tbody>
-
                 {% for signage in signages %}
                     <tr>
                         <td>{{ signage[0] }}</td>
                         <td>{{ signage[1] }}</td>
-                        <td><a href="/manage/slide?id={{ signage[0] }}">Edit Slides</a> | <a href="/manage/edit?id={{ signage[0] }}">Edit Signage</a> | <a href="/manage/delete?id={{ signage[0] }}">Delete</a></td>
+                        <td><a href="/manage/slide?id={{ signage[0] }}">Edit Slides</a> | <a href="/manage/edit?id={{ signage[0] }}">Edit Signage</a> | <a href="/manage/delete?id={{ signage[0] }}">Delete</a> | <a href="/manage/begindisplay?id={{ signage[0] }}" class="text-success">Start Display</a></td>
                 </tr>
                 {% endfor %}
         </tbody>
