@@ -252,7 +252,7 @@ def slide():
         return render_template("manage/error.html", msg="This signage cannot be edited.")
 
     # Query slide
-    c.execute("SELECT iindex, imageurl, dduration FROM slides WHERE signageid=? ORDER BY iindex, id ASC", (sid,))
+    c.execute("SELECT iindex, imageurl, dduration, id FROM slides WHERE signageid=? ORDER BY iindex, id ASC", (sid,))
     slides = c.fetchall()
     conn.close()
 
@@ -302,3 +302,36 @@ def slide_add():
         sid = request.args.get("id")
 
         return render_template("manage/slide/add.html", signageid=sid)
+
+
+@manage.route("slide/delete", methods=["GET", "POST"])
+@login_required
+def slide_delete():
+    if request.method == "POST":
+        if not request.form.get("signageid") or not request.form.get("slid"):
+            return redirect("/manage/view")
+
+        sid = request.form.get("signageid")
+        slid = request.form.get("slid")
+
+        # Check owner
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
+        signage = c.fetchone()
+
+        if signage is None:
+            conn.close()
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        # Delete slide
+        c.execute("DELETE FROM slides WHERE signageid=? AND id=?", (sid,slid))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/manage/slide?id=" + sid)
+    else:
+        if not request.args.get("id") or not request.args.get("slid"):
+            return redirect("/manage/view")
+        return render_template("manage/slide/delete.html", signageid=request.args.get("id"), slid=request.args.get("slid"))
