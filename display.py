@@ -37,6 +37,12 @@ def begin():
         else:
             return render_template("display/error.html", msg="Signage could not be displayed.")
 
+        # Save hide cursor option
+        if request.form.get("hidecursor") is not None:
+            session["hidecursor"] = 1
+        else:
+            session["hidecursor"] = 0
+
         session["signageid"] = sid
         return redirect("/display/show")
     else:
@@ -45,12 +51,21 @@ def begin():
 
 @display.route("show")
 def show():
-    if session.get("signageid") is None:
+    if session.get("signageid") is None or session.get("hidecursor") is None:
         return redirect("/display")
     sid = session["signageid"]
+    cursoroption = session.get("hidecursor")
 
-    # Pop signageid session
+    # Pop session
     session.pop("signageid")
+    session.pop("hidecursor")
+
+    # Set cursor option
+    if cursoroption == 1:
+        cursor = "none"
+    else:
+        cursor = "default"
+
 
     # Query for special css
     conn = sqlite3.connect(dbpath)
@@ -68,4 +83,4 @@ def show():
     if len(slides) < 1:
         return render_template("display/error.html", msg="Signage doesn't contain any slide.")
 
-    return render_template("display/show.html", signageid=sid, slides=slides, css=specialcss)
+    return render_template("display/show.html", signageid=sid, slides=slides, css=specialcss, cursor=cursor)
