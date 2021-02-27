@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template
 from flask_session import Session
 
@@ -10,6 +12,10 @@ app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+# Exception if DB_PATH not set
+if not os.environ.get("DB_PATH"):
+    raise RuntimeError("DB_PATH not set")
 
 # Register blueprint
 app.register_blueprint(display, url_prefix="/display")
