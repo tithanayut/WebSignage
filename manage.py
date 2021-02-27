@@ -163,3 +163,71 @@ def create():
         return redirect("/manage/view")
     else:
         return render_template("manage/create.html")
+
+
+@manage.route("edit", methods=["GET", "POST"])
+@login_required
+def edit():
+    if request.method == "POST":
+        # Check for user's input
+        if not request.form.get("signageid") or not request.form.get("description"):
+            return render_template("manage/error.html", msg="Please complete the form.")
+
+        sid_old = request.form.get("signageid_old").upper()
+        sid_new = request.form.get("signageid").upper()
+        spw = request.form.get("signagepw")
+        scss = request.form.get("specialcss")
+        description = request.form.get("description")
+
+        # Check owner
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid_old, session["user_id"]))
+        signage = c.fetchone()
+
+        if signage is None:
+            conn.close()
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        # Check if Signage ID duplicate
+        c.execute("SELECT COUNT(id) AS \"COUNT(id)\" FROM signages WHERE signageid=?", (sid_new,))
+        q = c.fetchone()
+
+        if q[0] != 0 and sid_old != sid_new:
+            conn.close()
+            return render_template("manage/error.html", msg="This Signage ID already exists")
+
+        # Change password if requested
+        if spw != "":
+            spw_hashed = generate_password_hash(spw)
+            c.execute("UPDATE signages SET signageid=?, description=?, password=?, specialcss=? WHERE signageid=?", (sid_new, description, spw_hashed, scss, sid_old))
+        else:
+            c.execute("UPDATE signages SET signageid=?, description=?, specialcss=? WHERE signageid=?", (sid_new, description, scss, sid_old))
+
+        conn.commit()
+        conn.close()
+
+        return redirect("/manage/view")
+    else:
+        if not request.args.get("id"):
+            return redirect("/manage/view")
+
+        sid = request.args.get("id").upper()
+
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT signageid, description, specialcss FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
+        signage = c.fetchone()
+        conn.close()
+
+        if signage is None:
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        signageid = signage[0]
+        description = signage[1]
+        if signage[2] is not None:
+            scss = signage[2]
+        else:
+            scss = ""
+
+        return render_template("manage/edit.html", signageid=signageid, description=description, scss=scss)

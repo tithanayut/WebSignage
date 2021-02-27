@@ -1,0 +1,28 @@
+{% extends "manage/layout.html" %}
+
+{% block title %}
+    Edit
+{% endblock %}
+
+{% block main %}
+    <form action="" method="post">
+        <div class="form-group">
+            <small class="form-text text-muted"><span class="bold">Signage ID</span></small>
+            <input type="text" class="form-control" name="signageid" placeholder="Signage ID" value="{{ signageid }}" autocomplete="off" >
+        </div>
+        <div class="form-group">
+            <small class="form-text text-muted"><span class="bold">Description/Title</span></small>
+            <input type="text" class="form-control" name="description" placeholder="Description/Title" value="{{ description }}" autocomplete="off" >
+        </div>
+        <div class="form-group">
+            <small class="form-text text-muted"><span class="bold">Signage Password</span><br>You may change Signage Password by typing below.<br>Leave it blank to leave password unchange.</small>
+            <input type="password" class="form-control" name="signagepw" placeholder="Signage Password">
+        </div>
+        <div class="form-group">
+            <small class="form-text text-muted"><span class="bold">Custom CSS</span><br>You may insert custom CSS to modify how slides display.<br>Leave it blank for default display option.</small>
+            <textarea class="form-control" style="min-width: 300px;height:100px" name="specialcss" row="5" placeholder="Custom CSS">{{ scss }}</textarea>
+        </div>
+        <input type="hidden" name="signageid_old" value="{{ signageid }}">
+        <button class="btn btn-primary" type="submit">Edit</button>
+    </form>
+{% endblock %}
