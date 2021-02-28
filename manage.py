@@ -105,7 +105,7 @@ def delete():
     if request.method == "POST":
         if not request.form.get("signageid"):
             return redirect("/manage/view")
-        sid = request.form.get("signageid")
+        sid = request.form.get("signageid").upper()
 
         conn = sqlite3.connect(dbpath)
         c = conn.cursor()
@@ -259,7 +259,7 @@ def slide_add():
         if not request.form.get("signageid") or not request.form.get("sindex") or not request.form.get("surl") or not request.form.get("sduration"):
             return render_template("manage/error.html", msg="Please complete the form.")
 
-        sid = request.form.get("signageid")
+        sid = request.form.get("signageid").upper()
         surl = request.form.get("surl")
 
         # Validate index and duration
@@ -299,7 +299,7 @@ def slide_delete():
         if not request.form.get("signageid") or not request.form.get("slid"):
             return redirect("/manage/view")
 
-        sid = request.form.get("signageid")
+        sid = request.form.get("signageid").upper()
         slid = request.form.get("slid")
 
         # Check owner
@@ -337,3 +337,62 @@ def begindisplay():
     session["hidecursor"] = 1
 
     return redirect("/display/show")
+
+
+@manage.route("slide/edit", methods=["GET", "POST"])
+@login_required
+def slide_edit():
+    if request.method == "POST":
+        # Check for user's input
+        if not request.form.get("signageid") or not request.form.get("slid") or not request.form.get("sindex") or not request.form.get("surl") or not request.form.get("sduration"):
+            return render_template("manage/error.html", msg="Please complete the form.")
+
+        sid = request.form.get("signageid").upper()
+        slid = request.form.get("slid")
+        surl = request.form.get("surl")
+
+        # Validate index and duration
+        try:
+            sduration = int(request.form.get("sduration"))
+            sindex = float(request.form.get("sindex"))
+            if sduration < 0 or sindex < 0:
+                return render_template("manage/error.html", msg="Duration/Index value is invalid.")
+        except ValueError:
+            return render_template("manage/error.html", msg="Duration/Index value is invalid.")
+
+        # Check owner
+        if not validate_signage_owner(sid, session["user_id"]):
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("UPDATE slides SET iindex=?, imageurl=?, dduration=? WHERE signageid=? AND id=?", (sindex, surl, sduration, sid, slid))
+        conn.commit()
+        conn.close()
+
+        return redirect("/manage/slide?id=" + sid)
+    else:
+        if not request.args.get("id") or not request.args.get("slid"):
+            return redirect("/manage/view")
+
+        sid = request.args.get("id").upper()
+        slid = request.args.get("slid")
+
+        # Check owner
+        if not validate_signage_owner(sid, session["user_id"]):
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
+        c.execute("SELECT iindex, imageurl, dduration FROM slides WHERE signageid=? AND id=?", (sid, slid))
+        slide = c.fetchone()
+        conn.close()
+
+        if slide is None:
+            return render_template("manage/error.html", msg="This signage cannot be edited.")
+
+        sindex = slide[0]
+        surl = slide[1]
+        sduration = slide[2]
+
+        return render_template("manage/slide/edit.html", signageid=sid, slid=slid, sindex=sindex, surl=surl, sduration=sduration)

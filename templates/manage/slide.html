@@ -13,7 +13,7 @@
         <p>You have {{ slides|length }} slides in total.</p>
     {% endif %}
 
-    <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slides</button></a><br>
+    <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slide</button></a><br>
     <a href="/manage/view"><button type="button" class="btn btn-link">Go Back</button></a><br>
     <br>
     <table class="table">
@@ -39,7 +39,7 @@
     {% else %}
         You have no slide yet. You may want to <a href="/manage/slide/add?id={{ signageid }}">add</a> one.
         <br><br>
-        <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slides</button></a><br>
+        <a href="/manage/slide/add?id={{ signageid }}"><button type="button" class="btn btn-primary">Add new slide</button></a><br>
         <a href="/manage/view"><button type="button" class="btn btn-link">Go Back</button></a>
     {% endif %}
 {% endblock %}
