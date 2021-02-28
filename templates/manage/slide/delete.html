@@ -13,10 +13,10 @@
     </form>
     <br>
     <button type="button" class="btn btn-link" onclick="goBack()">Go Back</button>
+{% endblock %}
 
-    <script>
-        function goBack() {
-            window.history.back();
-        }
-    </script>
+{% block js %}
+    function goBack() {
+        window.history.back();
+    }
 {% endblock %}

@@ -22,11 +22,11 @@
         <input type="hidden" name="signageid" value="{{ signageid }}">
         <button class="btn btn-primary" type="submit">Add Slide</button><br>
         <button type="button" class="btn btn-link" onclick="goBack()">Go Back</button>
-
-        <script>
-            function goBack() {
-                window.history.back();
-            }
-        </script>
     </form>
+{% endblock %}
+
+{% block js %}
+    function goBack() {
+        window.history.back();
+    }
 {% endblock %}
