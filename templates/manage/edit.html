@@ -25,4 +25,11 @@
         <input type="hidden" name="signageid_old" value="{{ signageid }}">
         <button class="btn btn-primary" type="submit">Edit</button>
     </form>
+    <button type="button" class="btn btn-link" onclick="goBack()">Go Back</button>
+{% endblock %}
+
+{% block js %}
+    function goBack() {
+        window.history.back();
+    }
 {% endblock %}
