@@ -5,7 +5,7 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 
-from auth import login_required
+from auth import login_required, validate_signage_owner
 
 # Config db connection
 dbpath = os.getenv("DB_PATH")
@@ -180,16 +180,12 @@ def edit():
         description = request.form.get("description")
 
         # Check owner
-        conn = sqlite3.connect(dbpath)
-        c = conn.cursor()
-        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid_old, session["user_id"]))
-        signage = c.fetchone()
-
-        if signage is None:
-            conn.close()
+        if not validate_signage_owner(sid_old, session["user_id"]):
             return render_template("manage/error.html", msg="This signage cannot be edited.")
 
         # Check if Signage ID duplicate
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
         c.execute("SELECT COUNT(id) AS \"COUNT(id)\" FROM signages WHERE signageid=?", (sid_new,))
         q = c.fetchone()
 
@@ -242,16 +238,12 @@ def slide():
     sid = request.args.get("id")
 
     # Check owner
-    conn = sqlite3.connect(dbpath)
-    c = conn.cursor()
-    c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
-    signage = c.fetchone()
-
-    if signage is None:
-        conn.close()
+    if not validate_signage_owner(sid, session["user_id"]):
         return render_template("manage/error.html", msg="This signage cannot be edited.")
 
     # Query slide
+    conn = sqlite3.connect(dbpath)
+    c = conn.cursor()
     c.execute("SELECT iindex, imageurl, dduration, id FROM slides WHERE signageid=? ORDER BY iindex, id ASC", (sid,))
     slides = c.fetchall()
     conn.close()
@@ -280,16 +272,12 @@ def slide_add():
             return render_template("manage/error.html", msg="Duration/Index value is invalid.")
 
         # Check owner
-        conn = sqlite3.connect(dbpath)
-        c = conn.cursor()
-        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
-        signage = c.fetchone()
-
-        if signage is None:
-            conn.close()
+        if not validate_signage_owner(sid, session["user_id"]):
             return render_template("manage/error.html", msg="This signage cannot be edited.")
 
         # Add slide to database
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
         c.execute("INSERT INTO slides (signageid, iindex, imageurl, dduration) VALUES (?, ?, ?, ?)", (sid, sindex, surl, sduration))
         conn.commit()
         conn.close()
@@ -315,16 +303,12 @@ def slide_delete():
         slid = request.form.get("slid")
 
         # Check owner
-        conn = sqlite3.connect(dbpath)
-        c = conn.cursor()
-        c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
-        signage = c.fetchone()
-
-        if signage is None:
-            conn.close()
+        if not validate_signage_owner(sid, session["user_id"]):
             return render_template("manage/error.html", msg="This signage cannot be edited.")
 
         # Delete slide
+        conn = sqlite3.connect(dbpath)
+        c = conn.cursor()
         c.execute("DELETE FROM slides WHERE signageid=? AND id=?", (sid,slid))
 
         conn.commit()
@@ -346,13 +330,7 @@ def begindisplay():
     sid = request.args.get("id")
 
     # Check owner
-    conn = sqlite3.connect(dbpath)
-    c = conn.cursor()
-    c.execute("SELECT signageid FROM signages WHERE signageid=? AND username=?", (sid, session["user_id"]))
-    signage = c.fetchone()
-    conn.close()
-
-    if signage is None:
+    if not validate_signage_owner(sid, session["user_id"]):
         return render_template("manage/error.html", msg="Permission error or signage is not found.")
 
     session["signageid"] = sid
