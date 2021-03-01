@@ -15,8 +15,10 @@
     <body>
         {% block main %}{% endblock %}
 
+        {% if self.js() %}
         <script>
             {% block js %}{% endblock %}
         </script>
+        {% endif %}
     </body>
 </html>
