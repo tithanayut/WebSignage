@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  websignage:
+    build: "./"
+    ports:
+      - "4000:4000"
+    volumes:
+      - "db:/app/db"
+
+volumes:
+  db:
